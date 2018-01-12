@@ -12,6 +12,9 @@
 		54AE102E2007F203005FFA29 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54AE102C2007F203005FFA29 /* LaunchScreen.storyboard */; };
 		54AE10362007F256005FFA29 /* AnimationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54AE10352007F256005FFA29 /* AnimationViewController.swift */; };
 		54AE10382007F270005FFA29 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54AE10372007F270005FFA29 /* SettingsViewController.swift */; };
+		8139DBD22009190400C4572B /* CustomAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8139DBD12009190400C4572B /* CustomAnimationView.swift */; };
+		8139DBD72009253F00C4572B /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8139DBD62009253F00C4572B /* TableViewCell.swift */; };
+		8139DBD92009443B00C4572B /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8139DBD82009443B00C4572B /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +25,9 @@
 		54AE102F2007F203005FFA29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54AE10352007F256005FFA29 /* AnimationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationViewController.swift; sourceTree = "<group>"; };
 		54AE10372007F270005FFA29 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		8139DBD12009190400C4572B /* CustomAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAnimationView.swift; sourceTree = "<group>"; };
+		8139DBD62009253F00C4572B /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
+		8139DBD82009443B00C4572B /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,11 +63,22 @@
 				54AE10232007F203005FFA29 /* AppDelegate.swift */,
 				54AE10352007F256005FFA29 /* AnimationViewController.swift */,
 				54AE10372007F270005FFA29 /* SettingsViewController.swift */,
+				8139DBD82009443B00C4572B /* Model.swift */,
+				8139DBD52009251400C4572B /* Views */,
 				54AE102A2007F203005FFA29 /* Assets.xcassets */,
 				54AE102C2007F203005FFA29 /* LaunchScreen.storyboard */,
 				54AE102F2007F203005FFA29 /* Info.plist */,
 			);
 			path = "Unit4FinalAssessment-StudentVersion";
+			sourceTree = "<group>";
+		};
+		8139DBD52009251400C4572B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8139DBD12009190400C4572B /* CustomAnimationView.swift */,
+				8139DBD62009253F00C4572B /* TableViewCell.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,8 +152,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8139DBD72009253F00C4572B /* TableViewCell.swift in Sources */,
 				54AE10242007F203005FFA29 /* AppDelegate.swift in Sources */,
 				54AE10362007F256005FFA29 /* AnimationViewController.swift in Sources */,
+				8139DBD92009443B00C4572B /* Model.swift in Sources */,
+				8139DBD22009190400C4572B /* CustomAnimationView.swift in Sources */,
 				54AE10382007F270005FFA29 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -268,6 +288,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "Unit4FinalAssessment-StudentVersion/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "c4q.Unit4FinalAssessment-StudentVersion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -282,6 +303,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "Unit4FinalAssessment-StudentVersion/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "c4q.Unit4FinalAssessment-StudentVersion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
