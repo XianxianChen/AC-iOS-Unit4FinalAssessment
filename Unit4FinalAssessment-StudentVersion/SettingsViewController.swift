@@ -15,6 +15,7 @@ enum PropertyName: String {
     case horizontalOffset = "Horizontal Offset"
     case verticalOffset = "Vertical Offset"
     case numberOfFlips = "Number of Flips"
+    case duration = "Duration"
 }
 
 struct AnimationProperty {
@@ -24,6 +25,7 @@ struct AnimationProperty {
     let stepperIncrement: Double
     let startingStepperVal: Double
     var value: Double
+    var tag: Int
 }
 
 class SettingsViewController: UIViewController {
@@ -37,11 +39,13 @@ class SettingsViewController: UIViewController {
    
     var properties: [[AnimationProperty]] =
     [
-        [AnimationProperty(name: .widthMultiplier, stepperMin: 0, stepperMax: 1.5, stepperIncrement: 0.1, startingStepperVal: 0.0, value: 0.0),
-         AnimationProperty(name: .heightMultipiler, stepperMin: 0, stepperMax: 1.5, stepperIncrement: 0.1, startingStepperVal: 0.0, value: 0.0)],
-         [AnimationProperty(name: .horizontalOffset, stepperMin: 0, stepperMax: 1000.0, stepperIncrement: 1.0, startingStepperVal: 0.0, value: 0.0),
-          AnimationProperty(name: .verticalOffset, stepperMin: 0, stepperMax: 1000.0, stepperIncrement: 1.0, startingStepperVal: 0.0, value: 0.0)],
-           [AnimationProperty(name: .numberOfFlips, stepperMin: 1, stepperMax: Double.infinity, stepperIncrement: 1.0, startingStepperVal: 0.0, value: 0.0)]
+        [AnimationProperty(name: .widthMultiplier, stepperMin: 0.1, stepperMax: 1.8, stepperIncrement: 0.1, startingStepperVal: 1.0, value: 1.0, tag: 1),
+         AnimationProperty(name: .heightMultipiler, stepperMin: 0.1, stepperMax: 1.8, stepperIncrement: 0.1, startingStepperVal: 1.0, value: 1.0, tag: 2)],
+        [AnimationProperty(name: .horizontalOffset, stepperMin: -100, stepperMax: 80.0, stepperIncrement: 1.0, startingStepperVal: 0.0, value: 0.0, tag: 3),
+         AnimationProperty(name: .verticalOffset, stepperMin: -100, stepperMax: 80.0, stepperIncrement: 1.0, startingStepperVal: 0.0, value: 0.0, tag: 4)],
+        [AnimationProperty(name: .numberOfFlips, stepperMin: 1, stepperMax: 20, stepperIncrement: 1.0, startingStepperVal: 1.0, value: 1.0, tag: 5),
+         AnimationProperty(name: .duration, stepperMin: 0.1, stepperMax: 10, stepperIncrement: 0.5, startingStepperVal: 1.0, value: 1.0, tag: 6)
+            ]
         ]
 
     
@@ -73,18 +77,33 @@ class SettingsViewController: UIViewController {
      
     }
     func addValueToDefault(keyStr: String) {
-        for i in 0..<properties.count {
-            for j in 0..<properties[i].count {
-      UserDefaults.standard.setValue(properties[i][j].value, forKey: keyStr + properties[i][j].name.rawValue)
-        print(keyStr + properties[i][j].name.rawValue)
-        }
-    }
-      Model.manager.addToValueDict(from: keyStr, val0: properties[0][0].value, val1: properties[0][1].value, val2: properties[1][0].value, val3: properties[1][1].value, val4: properties[2][0].value)
+//        for i in 0..<properties.count {
+//            for j in 0..<properties[i].count {
+//      UserDefaults.standard.setValue(properties[i][j].value, forKey: keyStr + properties[i][j].name.rawValue)
+//        print(keyStr + properties[i][j].name.rawValue)
+//        }
+//    }
+      Model.manager.addToValueDict(from: keyStr, val0: properties[0][0].value, val1: properties[0][1].value, val2: properties[1][0].value, val3: properties[1][1].value, val4: properties[2][0].value, val5: properties[2][1].value)
         
     }
     
     @objc func stepperValueChanged(_ sender: UIStepper) {
-       
+        switch sender.tag {
+        case 1:
+            properties[0][0].value = sender.value
+        case 2:
+             properties[0][1].value = sender.value
+        case 3:
+             properties[1][0].value = sender.value
+        case 4:
+             properties[1][1].value = sender.value
+        case 5:
+             properties[2][0].value = sender.value
+        case 6:
+             properties[2][1].value = sender.value
+        default:
+            break
+        }
         tableView.reloadData()
       
     }
@@ -117,17 +136,22 @@ extension SettingsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //TO DO: Implement your Custom Cell that has a stepper
         let property = properties[indexPath.section][indexPath.row]
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "settingCell", for: indexPath) as! TableViewCell
+      //  cell.configureCell(from: property)
         cell.stepper.minimumValue = property.stepperMin
         cell.stepper.maximumValue = property.stepperMax
+        cell.stepper.value = property.value
         cell.stepper.stepValue = property.stepperIncrement
-     
-        cell.stepper.isEnabled = true
-  
-        cell.stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
-       properties[indexPath.section][indexPath.row].value = cell.stepper.value
+        cell.stepper.tag = property.tag
         
-        cell.label.text = "\(property.name.rawValue): \(cell.stepper.value)"
+        cell.label.text = "\(property.name.rawValue):  \(cell.stepper.value)"
+        cell.stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
+        cell.stepper.isEnabled = true
+        
+     //   properties[indexPath.section][indexPath.row].value = cell.stepper.value
+      //  cell.label.text = "\(property.name.rawValue): \(cell.stepper.value)"
+        
         return cell
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

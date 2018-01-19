@@ -9,6 +9,9 @@
 import UIKit
 
 class TableViewCell: UITableViewCell {
+    
+    var currentProperty: AnimationProperty!
+    
     lazy var label: UILabel = {
         let lab = UILabel()
         return lab
@@ -45,7 +48,23 @@ class TableViewCell: UITableViewCell {
         stepper.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
          stepper.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     }
+    func configureCell(from property: AnimationProperty) {
+        self.currentProperty = property
+         self.currentProperty.value = stepper.value
+        stepper.minimumValue = property.stepperMin
+        stepper.maximumValue = property.stepperMax
+        stepper.value = property.startingStepperVal
+        stepper.stepValue = property.stepperIncrement
+        
+        label.text = "\(currentProperty.name.rawValue):  \(stepper.value)"
+        stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
+    }
     
+    @objc func stepperValueChanged(_ sender: UIStepper) {
+        
+        label.text = "\(currentProperty.name.rawValue): \(stepper.value)"
+        
+    }
     
     
     override func awakeFromNib() {

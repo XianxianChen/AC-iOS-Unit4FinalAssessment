@@ -41,7 +41,7 @@ class CustomAnimationView: UIView {
         setupButton()
         setupPickerView()
     }
-    private func setupImageView() {
+     func setupImageView() {
         addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true

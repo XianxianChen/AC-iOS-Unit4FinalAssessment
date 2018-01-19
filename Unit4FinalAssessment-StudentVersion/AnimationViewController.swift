@@ -10,19 +10,22 @@ import UIKit
 enum ButtonState: String {
     case start = "start"
     case pause = "pause"
+    case resume = "resume"
 }
 class AnimationViewController: UIViewController {
     let animationView = CustomAnimationView()
-    var currentAnimation: String! = "Width Multiplier"
+    var currentAnimation: String! = "Default"
     var buttonState = ButtonState.start
-  
+
   
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor(red: 0.6, green: 0.6, blue: 0.9, alpha: 1.0)
         self.view.addSubview(animationView)
         self.animationView.button.setTitle("start", for: .normal)
+   
         setupAniamtionView()
+    
         self.animationView.pickerView.delegate = self
          self.animationView.pickerView.dataSource = self
         
@@ -31,17 +34,21 @@ class AnimationViewController: UIViewController {
    @objc func buttonPressed() {
         switch self.buttonState{
         case .start:
+            animationView.imageView.layer.removeAllAnimations()
             self.animateSnowMan()
-            self.animationView.imageView.startAnimating()
+             animationView.pickerView.isHidden = true
+            
               self.animationView.button.setTitle("pause", for: .normal)
             self.buttonState = .pause
         case .pause:
-            self.animationView.imageView.stopAnimating()
-            let animator = UIViewPropertyAnimator()
-            animator.stopAnimation(true)
-            self.animationView.imageView.layoutIfNeeded()
-              self.animationView.button.setTitle("start", for: .normal)
-            self.buttonState = .start
+            pause(layer: animationView.imageView.layer)
+            
+              self.animationView.button.setTitle("resume", for: .normal)
+            self.buttonState = .resume
+        case .resume:
+             resume(layer: animationView.imageView.layer)
+            self.animationView.button.setTitle("pause", for: .normal)
+            self.buttonState = .pause
         }
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -56,21 +63,15 @@ class AnimationViewController: UIViewController {
         animationView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
     }
      func animateSnowMan() {
-        
+        animationView.imageView.layer.removeAllAnimations()
         if currentAnimation == "Default" {
             defaultAnimate()
         } else {
             if let valArr = Model.manager.getVals()[currentAnimation] {
-                customAnimation(offSetfrom: valArr[2], y: valArr[3], scaleX: valArr[0], scaleY: valArr[1], numOfFlip: valArr[4])
+                customAnimation(offSetfrom: valArr[2], y: valArr[3], scaleX: valArr[0], scaleY: valArr[1], numOfFlip: valArr[4], duration: valArr[5])
             }
         }
-//        switch currentAnimation {
-//        case "Width Multiplier":
-//            customAnimation(offSetfrom: -50, y: -50, scaleX: 1.5, scaleY: 1.5, numOfFlip: 3)
-//            //defaultAnimate()
-//        default:
-//            defaultAnimate()
-//        }
+
         
     }
     
@@ -88,54 +89,122 @@ extension AnimationViewController: UIPickerViewDelegate, UIPickerViewDataSource 
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         self.currentAnimation = Model.manager.getSettings()[row]
+   
     }
 }
 extension AnimationViewController {
     
- 
+    func pause(layer: CALayer) {
+        let pausedTime = layer.convertTime(CACurrentMediaTime(), from: nil)
+        layer.speed = 0
+        layer.timeOffset = pausedTime
+    }
+    
+    func resume(layer: CALayer) {
+        let pausedTime = layer.timeOffset
+        layer.speed = 1
+        layer.timeOffset = 0
+        layer.beginTime = 0
+        let timeSincePause = layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        layer.beginTime = timeSincePause
+    }
 //  let widthMultiplierVal = UserDefaults.standard.value(forKey: <#T##String#>)
     
     func defaultAnimate() {
         
         let animation = CABasicAnimation(keyPath: "transform.rotation.x") //*** ketPath must be the exact right string. it's set by default, not custom. ***
-        
+        animation.delegate = self
         let angleRadian = CGFloat(.pi * 2.0 )// 360
         
         animation.fromValue = 0 // degree
         animation.byValue = angleRadian
         animation.duration = 4.0 //seconds
-        animation.repeatCount = Float.infinity
+        animation.repeatCount = 1.0
         animationView.imageView.layer.add(animation, forKey: nil)
         
 }
     
-    func customAnimation(offSetfrom x: Double, y: Double, scaleX: Double, scaleY: Double, numOfFlip: Double) {
-        
-        let animation = CABasicAnimation(keyPath: "transform.rotation.x") //*** ketPath must be the exact right string. it's set by default, not custom. ***
-        
+    func customAnimation(offSetfrom x: Double, y: Double, scaleX: Double, scaleY: Double, numOfFlip: Double, duration: Double) {
+       
+        let rotationX = CABasicAnimation(keyPath: "transform.rotation.x") //*** ketPath must be the exact right string. it's set by default, not custom. ***
+        rotationX.delegate = self
         let angleRadian = CGFloat(.pi * 2.0 )// 360
-      
-        animation.fromValue = 0 // degree
-        animation.byValue = angleRadian
-        animation.duration = 4.0 //seconds
-        animation.repeatCount = Float(numOfFlip)
-        animationView.imageView.layer.add(animation, forKey: nil)
+        rotationX.fromValue = 0 // degree
+        rotationX.byValue = angleRadian
+        rotationX.duration = duration //seconds
+        rotationX.repeatCount = Float(numOfFlip)
         
-        let origianlPosition: CGRect = self.animationView.imageView.frame
+        let rotationY = CABasicAnimation(keyPath: "transform.rotation.y")
+        rotationY.delegate = self
+        rotationY.fromValue = 0
+        rotationY.byValue = angleRadian
+        rotationY.duration = duration
+        rotationY.repeatCount = Float(numOfFlip)
         
-        let finalPosition = origianlPosition.offsetBy(dx: CGFloat(x), dy: CGFloat(y))
-        UIView.animate(withDuration: 4.0, animations: {
-            self.animationView.imageView.frame = finalPosition
-            self.animationView.imageView.transform = CGAffineTransform(scaleX: CGFloat(scaleX), y: CGFloat(scaleY))
-        }){(success) in
-            print("")
-        }
+        let rotationZ = CABasicAnimation(keyPath: "transform.rotation.z")
+        rotationZ.delegate = self
+        rotationZ.fromValue = 0
+        rotationZ.byValue = angleRadian
+        rotationZ.duration = duration
+        rotationZ.repeatCount = Float(numOfFlip)
+        
+       let animationScale = CABasicAnimation(keyPath: "transform.scale")
+        animationScale.delegate = self
+        animationScale.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        let fromValue = CATransform3DMakeScale(1, 1, 0)
+        let toValue = CATransform3DMakeScale(CGFloat(scaleX), CGFloat(scaleY), 0)
+       animationScale.fromValue = fromValue
+        animationScale.toValue = toValue
+        animationScale.duration = duration
+        animationScale.repeatCount = Float(numOfFlip)
+        
+    
+        let positionAnimation = CABasicAnimation(keyPath: "position")
+        positionAnimation.delegate = self
+        positionAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        positionAnimation.fromValue = self.animationView.imageView.layer.position
+        positionAnimation.toValue = CGPoint(x: (self.animationView.imageView.layer.position.x + CGFloat(x)), y: (self.animationView.imageView.layer.position.y + CGFloat(y)))
+        positionAnimation.duration = duration
+        positionAnimation.repeatCount = Float(numOfFlip)
+        
+        
+        
+        let groupAnimation = CAAnimationGroup()
+        groupAnimation.delegate = self
+        groupAnimation.animations = [rotationX, animationScale, positionAnimation]
+        groupAnimation.duration = duration
+        self.animationView.imageView.layer.add(groupAnimation, forKey: nil)
+        
+         print(x, y,scaleX, scaleY, numOfFlip, duration)
+        // final values
+      // self.animationView.imageView.layer.position = CGPoint(x: x, y: y)//self.animationView.imageView.layer.position
+
+    
+    
     }
-    
-    
+}
+extension AnimationViewController: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        self.animationView.button.setTitle("start", for: .normal)
+        self.buttonState = .start
+        animationView.pickerView.isHidden = false
+        
+    }
 }
 /*
    self.box.transform = CGAffineTransform(rotationAngle: CGFloat.pi).scaledBy(x: 0.1, y: 0.1)
+ 
+ //        let otherAnimation = UIViewPropertyAnimator(duration: 4.0, curve: UIViewAnimationCurve.easeIn) {
+ //
+ //            self.animationView.imageView.transform = CGAffineTransform(scaleX: CGFloat(scaleX), y: CGFloat(scaleY)).translatedBy(x: CGFloat(x), y: CGFloat(x))
+ //        }
+ 
+ 
+ //        otherAnimation.addCompletion({_ in
+ //
+ //            self.animationView.imageView.layer.transform = CATransform3DMakeAffineTransform(self.animationView.imageView.transform)
+ //
+ //        })
  */
 /*
  
@@ -162,7 +231,8 @@ extension AnimationViewController {
        propertyAnimator.addAnimations {
  self.view.layoutIfNeeded() // put in animation to change the layout slowly
  
- }        propertyAnimator.startAnimation()
+ }
+ propertyAnimator.startAnimation()
  
  */
  
